@@ -18,7 +18,10 @@ class SetadSource(private val http: OkHttpClient) {
 
     /** Returns every tender newer than [cutoff] (all of them when [cutoff] is empty), up to [maxPages] pages of 200. */
     fun fetch(cutoff: String, maxPages: Int, progress: (String) -> Unit): List<Notice> {
-        val html = http.getText(INDEX)
+        // index.action only sets the session cookie; the grid and its csrf token are in welcome.action,
+        // which a browser loads by ajax right after.
+        http.getText(INDEX)
+        val html = http.getText(WELCOME, mapOf("X-Requested-With" to "XMLHttpRequest", "Referer" to INDEX))
         val token = Jsoup.parse(html).selectFirst("input[name=csrf_token]")?.attr("value")
         if (token.isNullOrBlank()) throw IOException("توکن سایت ستاد پیدا نشد")
 
@@ -104,6 +107,7 @@ class SetadSource(private val http: OkHttpClient) {
     companion object {
         const val BASE = "https://etend.setadiran.ir/etend"
         const val INDEX = "$BASE/index.action"
+        private const val WELCOME = "$BASE/welcome.action"
         private const val ROWS = 200
     }
 }
