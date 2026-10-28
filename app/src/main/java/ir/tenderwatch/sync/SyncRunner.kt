@@ -5,6 +5,7 @@ import ir.tenderwatch.data.Prefs
 import ir.tenderwatch.data.Store
 import ir.tenderwatch.model.Notice
 import ir.tenderwatch.net.Http
+import ir.tenderwatch.net.describe
 import ir.tenderwatch.source.CdbSource
 import ir.tenderwatch.source.SetadSource
 import ir.tenderwatch.util.Jalali
@@ -49,7 +50,7 @@ object SyncRunner {
                 all.maxOfOrNull { it.date }?.let { if (it > cutoff) prefs.setadLastMax = it }
                 store.addNew(matched)
             } catch (e: Exception) {
-                errors += "ستاد: ${e.message ?: e.javaClass.simpleName}"
+                errors += "ستاد: ${describe(e)}"
                 emptyList()
             }
 
@@ -64,7 +65,7 @@ object SyncRunner {
                 prefs.cdbLastSuccess = now
                 store.addNew(found)
             } catch (e: Exception) {
-                errors += "قراردادها: ${e.message ?: e.javaClass.simpleName}"
+                errors += "قراردادها: ${describe(e)}"
                 emptyList()
             }
 
